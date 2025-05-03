@@ -1,0 +1,76 @@
+    matricula = input("Digite sua matrícula: ")
+    senha = input("Digite sua senha: ")
+    # Autenticação fictícia (em um sistema real, haveria verificação em banco de dados)
+    print(f"Acesso autorizado para a matrícula {matricula}.\n")
+    return matricula
+
+def calcular_inss(salario):
+    if salario <= 1518.00:
+        return salario * 0.075
+    elif salario <= 2793.88:
+        return salario * 0.09 - 113.85
+    elif salario <= 4190.83:
+        return salario * 0.12 - 189.54
+    elif salario <= 8157.41:
+        return salario * 0.14 - 318.38
+    else:
+        return 1142.04  # Teto de contribuição
+
+def calcular_irrf(salario, dependentes):
+    deducao_dependentes = dependentes * 189.59
+    base_calculo = salario - deducao_dependentes - calcular_inss(salario)
+
+    if base_calculo <= 2259.20:
+        return 0
+    elif base_calculo <= 2826.65:
+        return base_calculo * 0.075 - 169.44
+    elif base_calculo <= 3751.05:
+        return base_calculo * 0.15 - 381.44
+    elif base_calculo <= 4664.68:
+        return base_calculo * 0.225 - 662.77
+    else:
+        return base_calculo * 0.275 - 896.00
+
+def calcular_vale_transporte(salario, deseja_vale):
+    return salario * 0.06 if deseja_vale else 0
+
+def calcular_vale_refeicao(valor_beneficio):
+    return valor_beneficio * 0.20
+
+def calcular_plano_saude(dependentes):
+    return dependentes * 150.00
+
+def calcular_salario_liquido(salario, vale_transporte, vale_refeicao, inss, irrf, plano_saude):
+    return salario - (vale_transporte + vale_refeicao + inss + irrf + plano_saude)
+
+def main():
+    autenticar_funcionario()
+
+    try:
+        salario = float(input("Informe o salário base (R$): "))
+        deseja_vale = input("Deseja receber vale transporte? (s/n): ").strip().lower() == 's'
+        valor_refeicao = float(input("Informe o valor do vale refeição fornecido pela empresa (R$): "))
+        dependentes = int(input("Informe a quantidade de dependentes: "))
+    except ValueError:
+        print("Entrada inválida. Encerrando programa.")
+        return
+
+    inss = calcular_inss(salario)
+    irrf = calcular_irrf(salario, dependentes)
+    vt = calcular_vale_transporte(salario, deseja_vale)
+    vr = calcular_vale_refeicao(valor_refeicao)
+    ps = calcular_plano_saude(dependentes)
+
+    liquido = calcular_salario_liquido(salario, vt, vr, inss, irrf, ps)
+
+    print("\n--- Folha de Pagamento ---")
+    print(f"Salário Base: R$ {salario:.2f}")
+    print(f"INSS: R$ {inss:.2f}")
+    print(f"IRRF: R$ {irrf:.2f}")
+    print(f"Vale Transporte: R$ {vt:.2f}")
+    print(f"Vale Refeição: R$ {vr:.2f}")
+    print(f"Plano de Saúde: R$ {ps:.2f}")
+    print(f"Salário Líquido: R$ {liquido:.2f}")
+
+if __name__ == "__main__":
+    main()
